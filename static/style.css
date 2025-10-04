@@ -1,0 +1,407 @@
+/**
+ * STYLE SHEET CHÍNH CHO HỆ THỐNG ĐIỂM DANH SINH VIÊN
+ * 
+ * Chức năng chính:
+ * - Styling cho trang điểm danh và dashboard
+ * - Hỗ trợ theme tối/sáng với CSS variables
+ * - Responsive design cho mọi thiết bị
+ * - Animation và transition effects
+ * - Custom components styling
+ * 
+ * Các section chính:
+ * - CSS Variables - Định nghĩa màu sắc và kích thước
+ * - Base Styles - Styling cơ bản cho body, html
+ * - Card Components - Styling cho card container
+ * - Form Elements - Input, button, validation styles
+ * - Camera Container - Styling cho camera interface
+ * - Modal Styles - Success/error modal styling
+ * - Responsive Design - Mobile và tablet breakpoints
+ * - Dark Theme - Styling cho chế độ tối
+ * 
+ * Color Scheme:
+ * - Primary: #2c3e50 (Dark blue)
+ * - Accent: #27ae60 (Green)
+ * - Background: White/Gradient
+ * - Text: #2c3e50 (Dark)
+ * 
+ * Dependencies: Bootstrap 5, Font Awesome
+ * Author: Your Name
+ * Version: 1.0.0
+ */
+
+/* ===== DIEM DANH STYLE SHEET ===== */
+/* Tông màu: Trắng đen + Xanh lá nhạt */
+
+:root {
+    --primary-dark: #2c3e50;
+    --primary-light: #34495e;
+    --accent-green: #27ae60;
+    --accent-green-light: #2ecc71;
+    --accent-green-pale: #e8f5e8;
+    --background-overlay: rgba(255, 255, 255, 0.85);
+    --card-background: rgba(255, 255, 255, 0.98);
+    --text-dark: #2c3e50;
+    --text-light: #7f8c8d;
+    --border-color: #e8f5e8;
+    --shadow-light: rgba(0, 0, 0, 0.08);
+    --shadow-green: rgba(39, 174, 96, 0.2);
+}
+
+/* ===== BACKGROUND ===== */
+body {
+    background: url('diemdanh_background.jpg') center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--background-overlay);
+    z-index: -1;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.main-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.admin-container {
+    padding: 20px;
+}
+
+/* ===== CARDS ===== */
+.card {
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px var(--shadow-light);
+    backdrop-filter: blur(10px);
+    background: var(--card-background);
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+    color: white;
+    border-radius: 13px 13px 0 0 !important;
+    text-align: center;
+    padding: 2rem;
+    border-bottom: 3px solid var(--accent-green);
+}
+
+.card-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+    color: white;
+}
+
+.card-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+    color: white;
+}
+
+/* ===== FORMS ===== */
+.form-control {
+    border-radius: 10px;
+    border: 2px solid var(--border-color);
+    padding: 15px 20px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.form-control:focus {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 0.2rem var(--shadow-green);
+    background: white;
+}
+
+.form-label {
+    color: var(--text-dark);
+    font-weight: bold;
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+    border: 2px solid var(--accent-green);
+    border-radius: 10px;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-light) 100%);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--shadow-green);
+    color: white;
+}
+
+.btn-outline-primary {
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+    color: white;
+}
+
+.btn-success {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+    background-color: var(--accent-green-light);
+    border-color: var(--accent-green-light);
+}
+
+.btn-warning {
+    background-color: #f39c12;
+    border-color: #f39c12;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-warning:hover {
+    background-color: #e67e22;
+    border-color: #e67e22;
+}
+
+/* ===== CAMERA CONTAINER ===== */
+.camera-container {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #f8f9fa;
+    border: 2px dashed var(--accent-green);
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.camera-container:hover {
+    border-color: var(--accent-green-light);
+    background: #f0f8f0;
+}
+
+.camera-placeholder {
+    text-align: center;
+    color: var(--accent-green);
+}
+
+.camera-placeholder i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    color: var(--accent-green);
+}
+
+.camera-controls {
+    margin-top: 1rem;
+}
+
+.btn-camera {
+    margin: 0 5px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* ===== ALERTS ===== */
+.alert {
+    border-radius: 10px;
+    border: none;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border: 1px solid var(--accent-green);
+    border-radius: 10px;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border: 1px solid #e74c3c;
+    border-radius: 10px;
+}
+
+/* ===== MODAL ===== */
+.modal-content {
+    border-radius: 20px;
+    border: none;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+    color: white;
+    border-radius: 20px 20px 0 0;
+    border-bottom: 3px solid var(--accent-green);
+}
+
+.success-icon {
+    font-size: 4rem;
+    color: var(--accent-green);
+    margin-bottom: 1rem;
+}
+
+/* ===== ADMIN SPECIFIC ===== */
+.stats-card {
+    background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-light) 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 2px solid var(--border-color);
+    box-shadow: 0 4px 15px var(--shadow-green);
+}
+
+.stats-card.warning {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    border-color: #f39c12;
+}
+
+.stats-card.danger {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    border-color: #e74c3c;
+}
+
+.student-card {
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.student-card.attended {
+    border-color: var(--accent-green);
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+}
+
+.student-card.not-attended {
+    border-color: #e74c3c;
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+}
+
+.student-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px var(--shadow-light);
+}
+
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.status-attended {
+    background: var(--accent-green);
+    color: white;
+}
+
+.status-not-attended {
+    background: #e74c3c;
+    color: white;
+}
+
+.date-filter {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px var(--shadow-light);
+    border: 2px solid var(--border-color);
+}
+
+.back-btn {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+    border: 2px solid var(--accent-green);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-light) 100%);
+    border-color: var(--primary-dark);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px var(--shadow-green);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .card-header {
+        padding: 1.5rem;
+    }
+    
+    .card-title {
+        font-size: 1.5rem;
+    }
+    
+    .camera-container {
+        min-height: 250px;
+    }
+    
+    .summary-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .attendance-image {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* ===== UTILITIES ===== */
+.text-primary {
+    color: var(--accent-green) !important;
+}
+
+.border-primary {
+    border-color: var(--accent-green) !important;
+}
+
+.bg-primary {
+    background-color: var(--accent-green) !important;
+}
+
+

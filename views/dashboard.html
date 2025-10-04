@@ -1,0 +1,1223 @@
+<!--
+    DASHBOARD QUẢN LÝ ĐIỂM DANH SINH VIÊN
+    
+    Chức năng chính:
+    - Hiển thị danh sách điểm danh theo ngày
+    - Thống kê tổng quan (tổng SV, đã điểm danh, chưa điểm danh, tỷ lệ)
+    - Sắp xếp và lọc dữ liệu điểm danh
+    - Xem ảnh điểm danh của từng sinh viên
+    - Hỗ trợ theme tối/sáng
+    - Responsive design cho mọi thiết bị
+    
+    Tính năng:
+    - Date picker với validation (chỉ xem từ 04/10/2025 đến hôm nay)
+    - Table sorting theo các cột khác nhau
+    - Image modal để xem ảnh điểm danh
+    - Default avatar khi không có ảnh
+    - Real-time data loading với cache
+    - Mobile responsive layout
+    
+    API sử dụng:
+    - GET /api/dashboard/attendance-summary - Tóm tắt điểm danh
+    - GET /api/dashboard/attendance-data - Dữ liệu chi tiết
+    
+    Dependencies: Bootstrap 5, Font Awesome, Custom CSS/JS
+    Author: Your Name
+    Version: 1.0.0
+-->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điểm Danh Sinh Viên</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/style.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #2c3e50;
+            --primary-light: #34495e;
+            --accent-green: #27ae60;
+            --accent-green-light: #2ecc71;
+            --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --main-bg: rgba(255,255,255,0.95);
+            --text-color: #2c3e50;
+            --text-light: #6c757d;
+            --card-bg: white;
+            --border-color: #dee2e6;
+            --shadow: rgba(0,0,0,0.1);
+            --header-bg: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            --table-header-bg: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            --table-bg: white;
+            --table-border: #dee2e6;
+        }
+
+        [data-theme="dark"] {
+            --background-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --main-bg: rgba(30,30,46,0.95);
+            --text-color: #e0e0e0;
+            --text-light: #b0b0b0;
+            --card-bg: #2a2a3e;
+            --border-color: #444;
+            --shadow: rgba(0,0,0,0.3);
+            --header-bg: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            --table-header-bg: linear-gradient(135deg, #3a3a5e 0%, #4a4a7e 100%);
+            --table-bg: #2a2a3e;
+            --table-border: #555;
+        }
+
+        body {
+            background: var(--background-gradient);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            color: var(--text-color);
+        }
+        
+        .dashboard-container {
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header Styles */
+        .dashboard-header {
+            background: var(--header-bg);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px var(--shadow);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 2px solid var(--accent-green);
+        }
+        
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .dashboard-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .dashboard-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+        
+        .header-stats {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            background: var(--main-bg);
+            margin: 0;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            color: var(--text-color);
+        }
+        
+        /* Table Styles */
+        .attendance-table-container {
+            background: var(--table-bg);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px var(--shadow);
+            overflow: hidden;
+            margin-top: 2rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .table-header {
+            background: var(--table-header-bg);
+            color: var(--text-color);
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .table-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .attendance-table {
+            margin: 0;
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .attendance-table thead {
+            background: var(--table-header-bg);
+        }
+        
+        .attendance-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--table-border);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+        
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s ease;
+        }
+        
+        .sortable:hover {
+            background-color: var(--border-color);
+        }
+        
+        .sort-icon {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            color: #6c757d;
+            opacity: 0.5;
+            transition: all 0.2s ease;
+        }
+        
+        .sortable:hover .sort-icon {
+            opacity: 1;
+            color: #495057;
+        }
+        
+        .sort-asc .sort-icon {
+            opacity: 1;
+            color: #667eea;
+        }
+        
+        .sort-asc .sort-icon::before {
+            content: "\f0de"; /* fa-sort-up */
+        }
+        
+        .sort-desc .sort-icon {
+            opacity: 1;
+            color: #667eea;
+        }
+        
+        .sort-desc .sort-icon::before {
+            content: "\f0dd"; /* fa-sort-down */
+        }
+        
+        .attendance-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--table-border);
+            vertical-align: middle;
+            color: var(--text-color);
+        }
+        
+        .attendance-table tbody tr:hover {
+            background-color: var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+        
+        .attendance-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .student-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .student-avatar:hover {
+            transform: scale(1.1);
+        }
+        
+        .student-avatar-placeholder {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 1.2rem;
+        }
+        
+        .student-avatar-default {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .student-avatar-default:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Dark theme for default avatar */
+        [data-theme="dark"] .student-avatar-default {
+            background: #2a2a3e;
+            border-color: #555;
+            color: #b0b0b0;
+        }
+        
+        [data-theme="dark"] .student-avatar-default:hover {
+            background: #3a3a5e;
+            border-color: #667eea;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-attended {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        
+        .status-not-attended {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            color: white;
+        }
+        
+        .time-badge {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .mssv-badge {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .mssv-badge.missing {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            opacity: 0.8;
+        }
+        
+        .student-name.missing {
+            color: #dc3545;
+            font-style: italic;
+        }
+        
+        /* Report Section Styles */
+        .report-section {
+            margin-bottom: 2rem;
+        }
+        
+        .report-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px var(--shadow);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            color: var(--text-color);
+        }
+        
+        .report-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .report-card.success {
+            border-left: 4px solid #28a745;
+        }
+        
+        .report-card.warning {
+            border-left: 4px solid #ffc107;
+        }
+        
+        .report-card.info {
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .report-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .report-card .report-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .report-card.success .report-icon {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .report-card.warning .report-icon {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+        
+        .report-card.info .report-icon {
+            background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+        }
+        
+        .report-content h4 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+            color: var(--text-color);
+        }
+        
+        .report-content p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .date-filter {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px var(--shadow);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+        
+        .date-filter .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        .date-filter .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: var(--card-bg);
+        }
+        
+        
+        .date-filter .btn {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .date-filter .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        @media (max-width: 768px) {
+            .date-filter .d-flex {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+            
+            .date-filter .d-flex > div {
+                margin-bottom: 0.5rem;
+            }
+            
+            .date-filter .form-control {
+                width: 100% !important;
+            }
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: #667eea;
+        }
+        
+        .image-modal .modal-dialog {
+            max-width: 80%;
+        }
+        
+        .image-modal .modal-body {
+            text-align: center;
+        }
+        
+        .image-modal img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            font-size: 0.9rem;
+        }
+        
+        .back-btn:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+        
+        .no-data i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        /* Theme Toggle Button */
+        #themeToggle {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        #themeToggle:hover {
+            transform: scale(1.1);
+            border-color: rgba(255,255,255,0.6);
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-title {
+                font-size: 2rem;
+            }
+            
+            .attendance-table th,
+            .attendance-table td {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .student-avatar,
+            .student-avatar-placeholder {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+
+            #themeToggle {
+                margin-top: 1rem;
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            <a href="/" class="back-btn me-3">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                            <div>
+                                <h1 class="dashboard-title d-inline-block me-3">
+                                    <i class="fas fa-tachometer-alt me-2"></i>
+                                    Điểm Danh
+                                </h1>
+                                <span class="dashboard-subtitle">Theo dõi và quản lý điểm danh sinh viên</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-light btn-sm" id="themeToggle" title="Đổi tông màu">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="container">
+                <!-- Date Filter -->
+                <div class="date-filter">
+                    <div class="d-flex align-items-center flex-wrap gap-3">
+                        <div class="d-flex align-items-center">
+                            <label for="dateFilter" class="form-label fw-bold mb-0 me-2">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                Chọn ngày:
+                            </label>
+                            <input type="date" class="form-control" id="dateFilter" onchange="loadAttendanceData()" style="width: 180px;" min="2025-10-04" max="">
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary btn-sm" onclick="loadAttendanceData()">
+                                <i class="fas fa-search me-1"></i>Tải dữ liệu
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="loadTodayData()">
+                                <i class="fas fa-calendar-day me-1"></i>Hôm nay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div class="loading" id="loading" style="display: none;">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <p class="mt-3">Đang tải dữ liệu điểm danh...</p>
+                </div>
+
+                <!-- Report Section -->
+                <div class="report-section" id="reportSection" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="report-card">
+                                <div class="report-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="report-content">
+                                    <h4 id="totalStudents">0</h4>
+                                    <p>Tổng sinh viên</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="report-card success">
+                                <div class="report-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="report-content">
+                                    <h4 id="attendedCount">0</h4>
+                                    <p>Đã điểm danh</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="report-card warning">
+                                <div class="report-icon">
+                                    <i class="fas fa-times-circle"></i>
+                                </div>
+                                <div class="report-content">
+                                    <h4 id="notAttendedCount">0</h4>
+                                    <p>Chưa điểm danh</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="report-card info">
+                                <div class="report-icon">
+                                    <i class="fas fa-percentage"></i>
+                                </div>
+                                <div class="report-content">
+                                    <h4 id="attendanceRate">0%</h4>
+                                    <p>Tỷ lệ điểm danh</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance Table -->
+                <div class="attendance-table-container" id="attendanceTableContainer" style="display: none;">
+                    <div class="table-header">
+                        <h3 class="table-title">
+                            <i class="fas fa-list-alt me-2"></i>
+                            Danh Sách Điểm Danh
+                        </h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="attendance-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;" class="sortable" data-sort="image">
+                                        Hình ảnh
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th style="width: 100px;" class="sortable" data-sort="mssv">
+                                        MSSV
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th style="width: 200px;" class="sortable" data-sort="name">
+                                        Họ và tên
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th style="width: 120px;" class="sortable" data-sort="status">
+                                        Trạng thái
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th style="width: 180px;" class="sortable" data-sort="time">
+                                        Thời gian điểm danh
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceTableBody">
+                                <!-- Sẽ được load bằng JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- No Data -->
+                <div class="no-data" id="noData" style="display: none;">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h4>Chưa có dữ liệu điểm danh</h4>
+                    <p>Vui lòng chọn ngày khác hoặc kiểm tra lại sau.</p>
+                </div>
+
+    <!-- Image Modal -->
+    <div class="modal fade image-modal" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageModalLabel">
+                        <i class="fas fa-image me-2"></i>Hình ảnh điểm danh
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img id="modalImage" src="" alt="Hình ảnh điểm danh" class="img-fluid">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dashboard functionality - simplified without authentication
+        let currentDate = new Date().toISOString().split('T')[0];
+        let currentData = { students: [], attendance_logs: [] };
+        let currentSort = { column: null, direction: 'asc' };
+        let dataCache = new Map(); // Cache for loaded data
+        
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+        
+        // Load saved theme or default to light
+        const savedTheme = localStorage.getItem('dashboardTheme') || 'light';
+        body.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+        
+        // Theme toggle event listener
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('dashboardTheme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+        
+        function updateThemeIcon(theme) {
+            if (theme === 'dark') {
+                themeIcon.className = 'fas fa-sun';
+                themeToggle.title = 'Chuyển sang tông sáng';
+            } else {
+                themeIcon.className = 'fas fa-moon';
+                themeToggle.title = 'Chuyển sang tông tối';
+            }
+        }
+        
+        // Set date constraints and default
+        function initializeDateFilter() {
+            const dateFilter = document.getElementById('dateFilter');
+            const today = new Date();
+            const todayString = today.toISOString().split('T')[0];
+            
+            // Set min date to 2025-10-04
+            dateFilter.min = '2025-10-04';
+            // Set max date to today
+            dateFilter.max = todayString;
+            
+            // Set default to today if today >= 2025-10-04, otherwise set to 2025-10-04
+            const minDate = new Date('2025-10-04');
+            if (today >= minDate) {
+                dateFilter.value = todayString;
+            } else {
+                dateFilter.value = '2025-10-04';
+            }
+            
+        }
+        
+        
+        // Load today's data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDateFilter();
+            loadAttendanceData();
+            initializeSorting();
+        });
+        
+        // Load today's data
+        function loadTodayData() {
+            const today = new Date();
+            const todayString = today.toISOString().split('T')[0];
+            const minDate = new Date('2025-10-04');
+            
+            // Check if today is before 2025-10-04
+            if (today < minDate) {
+                alert('Chưa đến ngày 04/10/2025. Sẽ hiển thị dữ liệu từ ngày 04/10/2025.');
+                document.getElementById('dateFilter').value = '2025-10-04';
+            } else {
+                document.getElementById('dateFilter').value = todayString;
+            }
+            
+            loadAttendanceData();
+        }
+        
+        // Load attendance data
+        async function loadAttendanceData() {
+            const date = document.getElementById('dateFilter').value;
+            if (!date) {
+                alert('Vui lòng chọn ngày');
+                return;
+            }
+            
+            // Validate date range
+            const selectedDate = new Date(date);
+            const minDate = new Date('2025-10-04');
+            const today = new Date();
+            today.setHours(23, 59, 59, 999); // End of today
+            
+            if (selectedDate < minDate) {
+                alert('Ngày không được nhỏ hơn 04/10/2025');
+                document.getElementById('dateFilter').value = '2025-10-04';
+                return;
+            }
+            
+            if (selectedDate > today) {
+                alert('Không thể xem dữ liệu tương lai. Chỉ có thể xem dữ liệu hiện tại và quá khứ.');
+                document.getElementById('dateFilter').value = new Date().toISOString().split('T')[0];
+                return;
+            }
+            
+            // Check cache first
+            if (dataCache.has(date)) {
+                console.log(`📦 Using cached data for date: ${date}`);
+                const cachedData = dataCache.get(date);
+                displaySummary(cachedData.summary);
+                displayStudents(cachedData.data);
+                return;
+            }
+            
+            showLoading(true);
+            const startTime = performance.now();
+            
+            try {
+                console.log(`🚀 Starting to load data for date: ${date}`);
+                
+                // Load both APIs in parallel for better performance
+                const [summaryResponse, dataResponse] = await Promise.all([
+                    fetch(`/api/dashboard/attendance-summary?date=${date}`),
+                    fetch(`/api/dashboard/attendance-data?date=${date}`)
+                ]);
+                
+                const [summary, data] = await Promise.all([
+                    summaryResponse.json(),
+                    dataResponse.json()
+                ]);
+                
+                const endTime = performance.now();
+                console.log(`⚡ Data loaded in ${(endTime - startTime).toFixed(2)}ms`);
+                
+                // Cache the data
+                dataCache.set(date, { summary, data });
+                
+                displaySummary(summary);
+                displayStudents(data);
+                
+            } catch (error) {
+                console.error('Lỗi tải dữ liệu:', error);
+                alert('Lỗi tải dữ liệu');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Display summary in report section
+        function displaySummary(summary) {
+            const reportSection = document.getElementById('reportSection');
+            document.getElementById('totalStudents').textContent = summary.total_students;
+            document.getElementById('attendedCount').textContent = summary.attended_count;
+            document.getElementById('notAttendedCount').textContent = summary.not_attended_count;
+            document.getElementById('attendanceRate').textContent = summary.attendance_rate + '%';
+            reportSection.style.display = 'block';
+        }
+        
+        // Display students in table format
+        function displayStudents(data) {
+            const { students, attendance_logs } = data;
+            currentData = { students, attendance_logs };
+            
+            const tableContainer = document.getElementById('attendanceTableContainer');
+            const tableBody = document.getElementById('attendanceTableBody');
+            const noData = document.getElementById('noData');
+            
+            console.log(`📊 Displaying data: ${students.length} students, ${attendance_logs.length} attendance logs`);
+            
+            // Hide containers initially
+            tableContainer.style.display = 'none';
+            if (noData) {
+                noData.style.display = 'none';
+            }
+            
+            // Check if we have students data
+            if (!students || students.length === 0) {
+                console.log('❌ No students data available');
+                if (noData) {
+                    noData.style.display = 'block';
+                }
+                return;
+            }
+            
+            // Apply current sort or default sort by time
+            const sortedData = applySorting(students, attendance_logs);
+            console.log(`✅ Sorted data: ${sortedData.length} items`);
+            
+            // Generate table rows
+            const tableRows = sortedData.map(item => {
+                const { student, attendance, isAttended } = item;
+                
+                // Xử lý dữ liệu sinh viên có thể thiếu
+                const hasMssv = student.mssv && student.mssv.trim() !== '';
+                const hasTen = student.ten && student.ten.trim() !== '';
+                
+                const mssv = hasMssv ? student.mssv : 'Không có MSSV';
+                const ten = hasTen ? student.ten : 'Không có tên';
+                
+                const mssvClass = hasMssv ? 'mssv-badge' : 'mssv-badge missing';
+                const nameClass = hasTen ? 'student-name' : 'student-name missing';
+                
+                return `
+                    <tr>
+                        <td>
+                            ${isAttended ? `
+                                ${attendance.hinhAnh && attendance.hinhAnh.trim() !== '' ? `
+                                    <img src="${attendance.hinhAnh}" 
+                                         class="student-avatar" 
+                                         onclick="showImage('${attendance.hinhAnh}')" 
+                                         alt="Ảnh điểm danh">
+                                ` : `
+                                    <div class="student-avatar-default" onclick="showDefaultAvatar()">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                `}
+                            ` : `
+                                <div class="student-avatar-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            `}
+                        </td>
+                        <td>
+                            <span class="${mssvClass}">${mssv}</span>
+                        </td>
+                        <td>
+                            <strong class="${nameClass}">${ten}</strong>
+                        </td>
+                        <td>
+                            <span class="status-badge ${isAttended ? 'status-attended' : 'status-not-attended'}">
+                                ${isAttended ? 'Đã điểm danh' : 'Chưa điểm danh'}
+                            </span>
+                        </td>
+                        <td>
+                            ${isAttended ? `
+                                <span class="time-badge">
+                                    <i class="fas fa-clock me-1"></i>
+                                    ${attendance.thoiGian}
+                                </span>
+                            ` : `
+                                <span class="text-muted">-</span>
+                            `}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tableBody.innerHTML = tableRows;
+            tableContainer.style.display = 'block';
+            console.log('✅ Table rendered successfully');
+        }
+        
+        // Show image modal
+        function showImage(imageSrc) {
+            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+            document.getElementById('modalImage').src = imageSrc;
+            modal.show();
+        }
+        
+        // Show default avatar modal
+        function showDefaultAvatar() {
+            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+            const modalBody = document.querySelector('#imageModal .modal-body');
+            
+            // Lưu nội dung gốc của modal body
+            const originalContent = modalBody.innerHTML;
+            
+            // Tạo nội dung mới cho avatar mặc định
+            modalBody.innerHTML = `
+                <div class="text-center">
+                    <div class="student-avatar-default mx-auto mb-3" style="width: 100px; height: 100px; font-size: 3rem;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <p class="text-muted">Không có hình ảnh điểm danh</p>
+                </div>
+            `;
+            
+            modal.show();
+            
+            // Khôi phục nội dung gốc khi modal đóng
+            modal._element.addEventListener('hidden.bs.modal', function() {
+                modalBody.innerHTML = originalContent;
+            }, { once: true });
+        }
+        
+        // Show loading
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('reportSection').style.display = show ? 'none' : 'block';
+            document.getElementById('attendanceTableContainer').style.display = show ? 'none' : 'block';
+            const noData = document.getElementById('noData');
+            if (noData) {
+                noData.style.display = show ? 'none' : 'block';
+            }
+        }
+        
+        // Initialize sorting functionality
+        function initializeSorting() {
+            const sortableHeaders = document.querySelectorAll('.sortable');
+            sortableHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const sortColumn = this.getAttribute('data-sort');
+                    sortTable(sortColumn);
+                });
+            });
+        }
+        
+        // Sort table by column
+        function sortTable(column) {
+            // Toggle sort direction if same column
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+            
+            // Update sort indicators
+            updateSortIndicators();
+            
+            // Re-render table with new sort
+            displayStudents(currentData);
+        }
+        
+        // Update sort indicators in headers
+        function updateSortIndicators() {
+            const sortableHeaders = document.querySelectorAll('.sortable');
+            sortableHeaders.forEach(header => {
+                header.classList.remove('sort-asc', 'sort-desc');
+                const column = header.getAttribute('data-sort');
+                if (column === currentSort.column) {
+                    header.classList.add(`sort-${currentSort.direction}`);
+                }
+            });
+        }
+        
+        // Apply sorting to data
+        function applySorting(students, attendance_logs) {
+            const sortStartTime = performance.now();
+            console.log(`🔄 Starting sort process for ${students.length} students`);
+            
+            // Create attendance map - hỗ trợ cả MSSV và tên
+            const attendanceMap = {};
+            attendance_logs.forEach(log => {
+                if (log.mssv && log.mssv.trim() !== '') {
+                    attendanceMap[log.mssv] = log;
+                }
+                // Nếu có tên nhưng không có MSSV, tạo key từ tên
+                if (log.ten && log.ten.trim() !== '' && (!log.mssv || log.mssv.trim() === '')) {
+                    attendanceMap[`NAME_${log.ten}`] = log;
+                }
+            });
+            console.log(`📋 Created attendance map with ${Object.keys(attendanceMap).length} entries`);
+            
+            // Create combined data array
+            const combinedData = students.map(student => {
+                // Tìm attendance log bằng MSSV hoặc tên
+                let attendance = attendanceMap[student.mssv];
+                if (!attendance && student.ten) {
+                    attendance = attendanceMap[`NAME_${student.ten}`];
+                }
+                
+                const isAttended = !!attendance;
+                
+                // Nếu có attendance log nhưng thiếu tên, sử dụng tên từ student data
+                let finalAttendance = attendance;
+                if (attendance && (!attendance.ten || attendance.ten.trim() === '')) {
+                    finalAttendance = {
+                        ...attendance,
+                        ten: student.ten || 'Không có tên'
+                    };
+                }
+                
+                return {
+                    student,
+                    attendance: finalAttendance || null,
+                    isAttended
+                };
+            });
+            console.log(`🔗 Combined data: ${combinedData.length} items`);
+            
+            // Apply sorting
+            combinedData.sort((a, b) => {
+                let aValue, bValue;
+                
+                switch (currentSort.column) {
+                    case 'mssv':
+                        aValue = a.student.mssv;
+                        bValue = b.student.mssv;
+                        break;
+                    case 'name':
+                        aValue = a.student.ten;
+                        bValue = b.student.ten;
+                        break;
+                    case 'status':
+                        aValue = a.isAttended ? 1 : 0;
+                        bValue = b.isAttended ? 1 : 0;
+                        break;
+                    case 'time':
+                        aValue = a.attendance ? new Date(a.attendance.thoiGian) : new Date(0);
+                        bValue = b.attendance ? new Date(b.attendance.thoiGian) : new Date(0);
+                        break;
+                    case 'image':
+                        aValue = a.isAttended ? 1 : 0;
+                        bValue = b.isAttended ? 1 : 0;
+                        break;
+                    default:
+                        // Default sort by time (newest first)
+                        aValue = a.attendance ? new Date(a.attendance.thoiGian) : new Date(0);
+                        bValue = b.attendance ? new Date(b.attendance.thoiGian) : new Date(0);
+                        return bValue - aValue; // Default desc for time
+                }
+                
+                // Handle string comparison
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    const result = aValue.localeCompare(bValue, 'vi');
+                    return currentSort.direction === 'asc' ? result : -result;
+                }
+                
+                // Handle numeric/date comparison
+                if (aValue < bValue) return currentSort.direction === 'asc' ? -1 : 1;
+                if (aValue > bValue) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            const sortEndTime = performance.now();
+            console.log(`⚡ Sort completed in ${(sortEndTime - sortStartTime).toFixed(2)}ms`);
+            
+            return combinedData;
+        }
+    </script>
+</body>
+</html>

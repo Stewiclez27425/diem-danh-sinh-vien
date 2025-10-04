@@ -1,0 +1,607 @@
+<!--
+    TRANG CHÍNH ĐIỂM DANH SINH VIÊN
+    
+    Chức năng chính:
+    - Giao diện điểm danh với camera tích hợp
+    - Nhập MSSV và chụp ảnh để điểm danh
+    - Hỗ trợ theme tối/sáng
+    - Responsive design cho mọi thiết bị
+    - Validation dữ liệu đầu vào
+    - Upload ảnh và gửi dữ liệu lên server
+    
+    Tính năng:
+    - Camera API với WebRTC
+    - File upload với preview
+    - Theme toggle (light/dark)
+    - Form validation
+    - Success/Error notifications
+    - Mobile responsive
+    
+    Dependencies: Bootstrap 5, Font Awesome, Custom CSS/JS
+    Author: Your Name
+    Version: 1.0.0
+-->
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điểm Danh Sinh Viên Tổ 3</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/style.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-dark: #2c3e50;
+            --primary-light: #34495e;
+            --accent-green: #27ae60;
+            --accent-green-light: #2ecc71;
+            --accent-green-pale: #e8f5e8;
+            --background-overlay: rgba(255, 255, 255, 0.85);
+            --card-background: rgba(255, 255, 255, 0.98);
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --border-color: #e8f5e8;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-green: rgba(39, 174, 96, 0.2);
+        }
+
+        body {
+            background: url('/static/diemdanh_background.jpg') center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-overlay);
+            z-index: -1;
+        }
+        
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .card {
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            box-shadow: 0 8px 25px var(--shadow-light);
+            background: var(--card-background);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+            color: white;
+            border-radius: 13px 13px 0 0 !important;
+            text-align: center;
+            padding: 2rem;
+            border-bottom: 3px solid var(--accent-green);
+        }
+        
+        .card-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .card-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 0.2rem var(--shadow-green);
+            background: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+            border: 2px solid var(--accent-green);
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-light) 100%);
+            border-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow-green);
+            color: white;
+        }
+        
+        .camera-container {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #f8f9fa;
+            border: 2px dashed var(--accent-green);
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .camera-container:hover {
+            border-color: var(--accent-green-light);
+            background: #f0f8f0;
+        }
+        
+        #video {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+        }
+        
+        #canvas {
+            display: none;
+        }
+        
+        .camera-placeholder {
+            text-align: center;
+            color: var(--accent-green);
+        }
+        
+        .camera-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--accent-green);
+        }
+        
+        .captured-image {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+        }
+        
+        .loading {
+            display: none;
+        }
+        
+        .spinner-border {
+            width: 2rem;
+            height: 2rem;
+        }
+        
+        .alert {
+            border-radius: 15px;
+            border: none;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            color: #155724;
+            border: 1px solid var(--accent-green);
+            border-radius: 10px;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            color: #721c24;
+            border: 1px solid #e74c3c;
+            border-radius: 10px;
+        }
+        
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            border-bottom: 3px solid var(--accent-green);
+        }
+        
+        .btn-close {
+            filter: invert(1);
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            color: var(--accent-green);
+            margin-bottom: 1rem;
+        }
+        
+        .camera-controls {
+            margin-top: 1rem;
+        }
+        
+        .btn-camera {
+            margin: 0 5px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+        
+        .btn-success:hover {
+            background-color: var(--accent-green-light);
+            border-color: var(--accent-green-light);
+        }
+        
+        .btn-outline-success {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            border-width: 2px;
+        }
+        
+        .btn-outline-success:hover {
+            background-color: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px var(--shadow-green);
+        }
+        
+        .btn-warning {
+            background-color: #f39c12;
+            border-color: #f39c12;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e67e22;
+            border-color: #e67e22;
+        }
+        
+        /* Dark Theme Styles */
+        [data-theme="dark"] {
+            --primary-dark: #1a1a2e;
+            --primary-light: #16213e;
+            --accent-green: #27ae60;
+            --accent-green-light: #2ecc71;
+            --accent-green-pale: #2d4a2d;
+            --background-overlay: rgba(0, 0, 0, 0.8);
+            --card-background: rgba(30, 30, 46, 0.95);
+            --text-dark: #e0e0e0;
+            --text-light: #b0b0b0;
+            --border-color: #444;
+            --shadow-light: rgba(0, 0, 0, 0.3);
+            --shadow-green: rgba(39, 174, 96, 0.3);
+        }
+
+        [data-theme="dark"] body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: var(--text-dark);
+        }
+
+        [data-theme="dark"] body::before {
+            background: var(--background-overlay);
+        }
+
+        [data-theme="dark"] .card {
+            background: var(--card-background);
+            border-color: var(--border-color);
+            color: var(--text-dark);
+        }
+
+        [data-theme="dark"] .card-header {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            border-bottom-color: var(--accent-green);
+        }
+
+        [data-theme="dark"] .form-control {
+            background: #1a1a2e;
+            border-color: var(--border-color);
+            color: var(--text-dark);
+        }
+
+        [data-theme="dark"] .form-control:focus {
+            background: #2a2a3e;
+            border-color: var(--accent-green);
+        }
+
+        [data-theme="dark"] .camera-container {
+            background: #1a1a2e;
+            border-color: var(--accent-green);
+        }
+
+        [data-theme="dark"] .camera-container:hover {
+            background: #2a2a3e;
+        }
+
+        [data-theme="dark"] .alert-info {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d4a7e 100%) !important;
+            color: var(--text-dark) !important;
+            border-left-color: #2196f3 !important;
+        }
+
+        [data-theme="dark"] .text-primary {
+            color: var(--accent-green) !important;
+        }
+
+        [data-theme="dark"] .text-dark {
+            color: var(--text-dark) !important;
+        }
+
+        [data-theme="dark"] .modal-content {
+            background: var(--card-background);
+            color: var(--text-dark);
+        }
+
+        [data-theme="dark"] .modal-header {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            border-bottom-color: var(--accent-green);
+        }
+
+        [data-theme="dark"] .btn-outline-success {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        [data-theme="dark"] .btn-outline-success:hover {
+            background-color: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+
+        /* Theme Toggle Button */
+        #themeToggle {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        #themeToggle:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .card-header {
+                padding: 1.5rem;
+            }
+            
+            .card-title {
+                font-size: 1.5rem;
+            }
+            
+            .camera-container {
+                min-height: 250px;
+            }
+
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+
+            #themeToggle {
+                margin-top: 1rem;
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-8 col-sm-10">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h1 class="card-title">
+                                        <i class="fas fa-user-check me-2"></i>
+                                        Điểm Danh Sinh Viên
+                                    </h1>
+                                    <p class="card-subtitle">Nhập MSSV và chụp ảnh để điểm danh</p>
+                                </div>
+                                <button class="btn btn-outline-light btn-sm" id="themeToggle" title="Đổi tông màu">
+                                    <i class="fas fa-moon" id="themeIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Box Lưu ý -->
+                            <div class="alert alert-info border-0 mb-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border-left: 4px solid #2196f3;">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-info-circle text-primary me-3 mt-1" style="font-size: 1.2rem;"></i>
+                                    <div>
+                                        <h6 class="alert-heading mb-2 fw-bold text-primary">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>
+                                            Lưu ý quan trọng
+                                        </h6>
+                                        <p class="mb-0 text-dark">
+                                            <strong>Mỗi sinh viên chỉ có thể điểm danh 1 lần duy nhất trong ngày.</strong><br>
+                                            <strong>Tổ trưởng tổ 3 không có trách nhiệm với thành viên tổ khác</strong><br>
+                                            <strong>Sinh viên thuộc tổ khác sẽ không hiện tên và MSSV sau khi điểm danh xong.</strong><br>
+                                            Hãy nhập đúng mã số sinh viên và chụp ảnh rõ nét để tránh sai sót.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <form id="attendanceForm" enctype="multipart/form-data">
+                                <div class="mb-4">
+                                    <label for="mssv" class="form-label fw-bold">
+                                        <i class="fas fa-id-card me-2"></i>
+                                        Mã số sinh viên
+                                    </label>
+                                    <input type="text" class="form-control" id="mssv" name="mssv" 
+                                           placeholder="Nhập MSSV của bạn" required>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">
+                                        <i class="fas fa-camera me-2"></i>
+                                        Chụp ảnh chứng minh
+                                    </label>
+                                    <div class="camera-container" id="cameraContainer">
+                                        <div class="camera-placeholder" id="cameraPlaceholder">
+                                            <i class="fas fa-camera"></i>
+                                            <p>Nhấn "Bật Camera" để chụp ảnh</p>
+                                        </div>
+                                        <video id="video" autoplay muted style="display: none;"></video>
+                                        <canvas id="canvas"></canvas>
+                                        <img id="capturedImage" class="captured-image" style="display: none;">
+                                    </div>
+                                    <div class="camera-controls text-center mt-3">
+                                        <button type="button" class="btn btn-outline-primary btn-camera" id="startCamera">
+                                            <i class="fas fa-video me-2"></i>Bật Camera
+                                        </button>
+                                        <button type="button" class="btn btn-success btn-camera" id="capturePhoto" style="display: none;">
+                                            <i class="fas fa-camera me-2"></i>Chụp Ảnh
+                                        </button>
+                                        <button type="button" class="btn btn-warning btn-camera" id="retakePhoto" style="display: none;">
+                                            <i class="fas fa-redo me-2"></i>Chụp Lại
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        Điểm Danh
+                                    </button>
+                                    <a href="/dashboard" class="btn btn-outline-success btn-lg">
+                                        <i class="fas fa-list-alt me-2"></i>
+                                        Check Điểm Danh
+                                    </a>
+                                </div>
+                                
+                                <div class="loading text-center mt-3">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Đang xử lý...</span>
+                                    </div>
+                                    <p class="mt-2">Đang xử lý điểm danh...</p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thông báo thành công -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Điểm Danh Thành Công
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4 id="successMessage" class="text-success mb-3"></h4>
+                    <p id="successTime" class="text-muted"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/script.js"></script>
+    
+    <!-- Link ẩn dashboard - chỉ hiển thị khi click vào logo 5 lần -->
+    <div id="hiddenDashboardLink" style="display: none; position: fixed; bottom: 10px; right: 10px; z-index: 9999;">
+        <a href="/dashboard-secret" class="btn btn-sm btn-outline-secondary" style="opacity: 0.3;">
+            <i class="fas fa-tachometer-alt"></i>
+        </a>
+    </div>
+    
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+        
+        // Load saved theme or default to light
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+        
+        // Theme toggle event listener
+        themeToggle.addEventListener('click', function() {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+        
+        function updateThemeIcon(theme) {
+            if (theme === 'dark') {
+                themeIcon.className = 'fas fa-sun';
+                themeToggle.title = 'Chuyển sang tông sáng';
+            } else {
+                themeIcon.className = 'fas fa-moon';
+                themeToggle.title = 'Chuyển sang tông tối';
+            }
+        }
+
+        // Ẩn link dashboard - chỉ hiển thị khi click vào logo 5 lần
+        let clickCount = 0;
+        const logo = document.querySelector('.card-title');
+        const hiddenLink = document.getElementById('hiddenDashboardLink');
+        
+        logo.addEventListener('click', function() {
+            clickCount++;
+            if (clickCount >= 5) {
+                hiddenLink.style.display = 'block';
+                clickCount = 0; // Reset để ẩn lại
+                setTimeout(() => {
+                    hiddenLink.style.display = 'none';
+                }, 10000); // Ẩn sau 10 giây
+            }
+        });
+    </script>
+</body>
+</html>
