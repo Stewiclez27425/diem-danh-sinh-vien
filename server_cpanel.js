@@ -1,28 +1,4 @@
-/**
- * HỆ THỐNG ĐIỂM DANH SINH VIÊN - SERVER CHÍNH
- * 
- * Chức năng chính:
- * - Xử lý API điểm danh với camera và upload ảnh
- * - Quản lý dữ liệu sinh viên từ CSV/Excel
- * - Cung cấp dashboard API cho việc xem và quản lý điểm danh
- * - Xử lý file upload với Multer middleware
- * - Phục vụ static files và templates HTML
- * - Hỗ trợ CORS và session management
- * 
- * API Endpoints:
- * - POST /attendance - Điểm danh sinh viên
- * - GET /dashboard - Trang dashboard quản lý
- * - GET /api/dashboard/attendance-summary - API tóm tắt điểm danh
- * - GET /api/dashboard/attendance-data - API dữ liệu điểm danh chi tiết
- * - GET /static/* - Phục vụ static files
- * - GET /uploads/* - Phục vụ ảnh đã upload
- * 
- * Dependencies: express, multer, cors, moment-timezone, csv-parser, xlsx
- * Author: Your Name
- * Version: 1.0.0
- */
-
-const express = require('express');
+    const express = require('express');
     const multer = require('multer');
     const cors = require('cors');
     const session = require('express-session');
@@ -235,6 +211,17 @@ const express = require('express');
         }
     });
 
+    app.get('/api/students', async (req, res) => {
+        try {
+            const students = await studentManager.getAllStudents();
+            console.log('📊 API students - Tổng số:', students.length);
+            res.json(students);
+        } catch (error) {
+            console.error('Lỗi API students:', error);
+            res.status(500).json({ error: 'Lỗi hệ thống' });
+        }
+    });
+
     // API debug để kiểm tra sinh viên
     app.get('/api/debug/students', async (req, res) => {
         try {
@@ -260,6 +247,10 @@ app.get('/api/dashboard/attendance-data', async (req, res) => {
         const { date } = req.query;
         console.log(`📊 Loading attendance data for date: ${date}`);
         
+        // Force reload data from files
+        await studentManager.initialize();
+        await attendanceManager.initialize();
+        
         // Load data in parallel for better performance
         const [students, logs] = await Promise.all([
             studentManager.getAllStudents(),
@@ -267,6 +258,14 @@ app.get('/api/dashboard/attendance-data', async (req, res) => {
         ]);
         
         console.log(`✅ Loaded ${students.length} students and ${logs.length} attendance logs`);
+        console.log(`📋 Logs for ${date}:`, logs.map(log => ({ mssv: log.mssv, ten: log.ten })));
+        
+        // Add cache-busting headers
+        res.set({
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        });
         
         res.json({
             students,
@@ -284,10 +283,23 @@ app.get('/api/dashboard/attendance-summary', async (req, res) => {
         const { date } = req.query;
         console.log(`📈 Loading attendance summary for date: ${date}`);
         
+        // Force reload data from files
+        await studentManager.initialize();
+        await attendanceManager.initialize();
+        
         const students = await studentManager.getAllStudents();
         const summary = await attendanceManager.getAttendanceSummaryWithStudentList(students, date);
         
         console.log(`✅ Summary loaded: ${summary.total_students} total, ${summary.attended_count} attended`);
+        console.log(`📋 Attended students:`, summary.attended_students);
+        console.log(`📋 Not attended students:`, summary.not_attended_students);
+        
+        // Add cache-busting headers
+        res.set({
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        });
         
         res.json(summary);
     } catch (error) {
