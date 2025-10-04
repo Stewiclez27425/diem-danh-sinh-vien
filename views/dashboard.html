@@ -1774,6 +1774,7 @@
             const searchInput = document.getElementById('searchInput');
             currentSearchTerm = searchInput.value;
             console.log(`🔍 Searching for: "${currentSearchTerm}"`);
+            console.log(`🔍 Current group filter: "${currentGroupFilter}"`);
             console.log(`🔍 Search term length: ${currentSearchTerm.length}`);
             console.log(`🔍 Search term trimmed: "${currentSearchTerm.trim()}"`);
             
@@ -1796,6 +1797,7 @@
             // Re-display current data with search filter
             if (currentData.students && currentData.attendance_logs) {
                 console.log(`🔍 Current data: ${currentData.students.length} students, ${currentData.attendance_logs.length} logs`);
+                console.log(`🔍 Will apply both search and group filters`);
                 // Display students first, then summary will be calculated in displaySummary
                 displayStudents(currentData);
             }
@@ -1806,6 +1808,7 @@
         function filterByGroup() {
             currentGroupFilter = document.getElementById('groupFilter').value;
             console.log(`🔍 Filtering by group: ${currentGroupFilter}`);
+            console.log(`🔍 Current search term: "${currentSearchTerm}"`);
             
             // Reset pagination when filtering
             currentPage = 1;
@@ -1822,6 +1825,7 @@
                     }
                 }
                 
+                console.log(`🔍 Will apply both group and search filters`);
                 // Display students first, then summary will be calculated in displaySummary
                 displayStudents(currentData);
             }
