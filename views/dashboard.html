@@ -27,6 +27,7 @@
 -->
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,12 +42,12 @@
             --accent-green: #27ae60;
             --accent-green-light: #2ecc71;
             --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --main-bg: rgba(255,255,255,0.95);
+            --main-bg: rgba(255, 255, 255, 0.95);
             --text-color: #2c3e50;
             --text-light: #6c757d;
             --card-bg: white;
             --border-color: #dee2e6;
-            --shadow: rgba(0,0,0,0.1);
+            --shadow: rgba(0, 0, 0, 0.1);
             --header-bg: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
             --table-header-bg: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             --table-bg: white;
@@ -55,12 +56,12 @@
 
         [data-theme="dark"] {
             --background-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            --main-bg: rgba(30,30,46,0.95);
+            --main-bg: rgba(30, 30, 46, 0.95);
             --text-color: #e0e0e0;
             --text-light: #b0b0b0;
             --card-bg: #2a2a3e;
             --border-color: #444;
-            --shadow: rgba(0,0,0,0.3);
+            --shadow: rgba(0, 0, 0, 0.3);
             --header-bg: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
             --table-header-bg: linear-gradient(135deg, #3a3a5e 0%, #4a4a7e 100%);
             --table-bg: #2a2a3e;
@@ -74,14 +75,14 @@
             position: relative;
             color: var(--text-color);
         }
-        
+
         .dashboard-container {
             padding: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
-        
+
         /* Header Styles */
         .dashboard-header {
             background: var(--header-bg);
@@ -92,7 +93,7 @@
             overflow: hidden;
             border-bottom: 2px solid var(--accent-green);
         }
-        
+
         .dashboard-header::before {
             content: '';
             position: absolute;
@@ -103,49 +104,49 @@
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
             opacity: 0.3;
         }
-        
+
         .header-content {
             position: relative;
             z-index: 2;
         }
-        
+
         .dashboard-title {
             font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-        
+
         .dashboard-subtitle {
             font-size: 0.9rem;
             opacity: 0.9;
             margin-bottom: 0;
         }
-        
+
         .header-stats {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
             padding: 1.5rem;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .stat-item {
             text-align: center;
             color: white;
         }
-        
+
         .stat-number {
             font-size: 2rem;
             font-weight: bold;
             display: block;
         }
-        
+
         .stat-label {
             font-size: 0.9rem;
             opacity: 0.8;
         }
-        
+
         /* Main Content */
         .main-content {
             flex: 1;
@@ -155,7 +156,7 @@
             backdrop-filter: blur(10px);
             color: var(--text-color);
         }
-        
+
         /* Table Styles */
         .attendance-table-container {
             background: var(--table-bg);
@@ -165,30 +166,30 @@
             margin-top: 2rem;
             border: 1px solid var(--border-color);
         }
-        
+
         .table-header {
             background: var(--table-header-bg);
             color: var(--text-color);
             padding: 1.5rem;
             text-align: center;
         }
-        
+
         .table-title {
             font-size: 1.5rem;
             font-weight: 600;
             margin: 0;
         }
-        
+
         .attendance-table {
             margin: 0;
             width: 100%;
             border-collapse: collapse;
         }
-        
+
         .attendance-table thead {
             background: var(--table-header-bg);
         }
-        
+
         .attendance-table th {
             padding: 1rem;
             text-align: left;
@@ -200,17 +201,17 @@
             letter-spacing: 0.5px;
             position: relative;
         }
-        
+
         .sortable {
             cursor: pointer;
             user-select: none;
             transition: background-color 0.2s ease;
         }
-        
+
         .sortable:hover {
             background-color: var(--border-color);
         }
-        
+
         .sort-icon {
             position: absolute;
             right: 8px;
@@ -221,61 +222,63 @@
             opacity: 0.5;
             transition: all 0.2s ease;
         }
-        
+
         .sortable:hover .sort-icon {
             opacity: 1;
             color: #495057;
         }
-        
+
         .sort-asc .sort-icon {
             opacity: 1;
             color: #667eea;
         }
-        
+
         .sort-asc .sort-icon::before {
-            content: "\f0de"; /* fa-sort-up */
+            content: "\f0de";
+            /* fa-sort-up */
         }
-        
+
         .sort-desc .sort-icon {
             opacity: 1;
             color: #667eea;
         }
-        
+
         .sort-desc .sort-icon::before {
-            content: "\f0dd"; /* fa-sort-down */
+            content: "\f0dd";
+            /* fa-sort-down */
         }
-        
+
         .attendance-table td {
             padding: 1rem;
             border-bottom: 1px solid var(--table-border);
             vertical-align: middle;
             color: var(--text-color);
         }
-        
+
         .attendance-table tbody tr:hover {
             background-color: var(--border-color);
             transition: background-color 0.2s ease;
         }
-        
+
         .attendance-table tbody tr:last-child td {
             border-bottom: none;
         }
-        
+
         .student-avatar {
             width: 50px;
             height: 50px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             cursor: pointer;
             transition: transform 0.2s ease;
         }
-        
+
         .student-avatar:hover {
             transform: scale(1.1);
         }
-        
+
         .student-avatar-placeholder {
             width: 50px;
             height: 50px;
@@ -287,7 +290,7 @@
             color: #6c757d;
             font-size: 1.2rem;
         }
-        
+
         .student-avatar-default {
             width: 50px;
             height: 50px;
@@ -302,23 +305,23 @@
             cursor: pointer;
             transition: transform 0.2s ease;
         }
-        
+
         .student-avatar-default:hover {
             transform: scale(1.1);
         }
-        
+
         /* Dark theme for default avatar */
         [data-theme="dark"] .student-avatar-default {
             background: #2a2a3e;
             border-color: #555;
             color: #b0b0b0;
         }
-        
+
         [data-theme="dark"] .student-avatar-default:hover {
             background: #3a3a5e;
             border-color: #667eea;
         }
-        
+
         .status-badge {
             padding: 6px 12px;
             border-radius: 20px;
@@ -327,17 +330,17 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
+
         .status-attended {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
         }
-        
+
         .status-not-attended {
             background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
             color: white;
         }
-        
+
         .time-badge {
             background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             color: white;
@@ -346,7 +349,7 @@
             font-size: 0.75rem;
             font-weight: 500;
         }
-        
+
         .mssv-badge {
             background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: white;
@@ -356,22 +359,22 @@
             font-weight: 600;
             font-family: 'Courier New', monospace;
         }
-        
+
         .mssv-badge.missing {
             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             opacity: 0.8;
         }
-        
+
         .student-name.missing {
             color: #dc3545;
             font-style: italic;
         }
-        
+
         /* Report Section Styles */
         .report-section {
             margin-bottom: 2rem;
         }
-        
+
         .report-card {
             background: var(--card-bg);
             border-radius: 15px;
@@ -383,24 +386,24 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             color: var(--text-color);
         }
-        
+
         .report-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         }
-        
+
         .report-card.success {
             border-left: 4px solid #28a745;
         }
-        
+
         .report-card.warning {
             border-left: 4px solid #ffc107;
         }
-        
+
         .report-card.info {
             border-left: 4px solid #17a2b8;
         }
-        
+
         .report-icon {
             width: 60px;
             height: 60px;
@@ -411,38 +414,38 @@
             margin-right: 1rem;
             font-size: 1.5rem;
         }
-        
+
         .report-card .report-icon {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
-        
+
         .report-card.success .report-icon {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         }
-        
+
         .report-card.warning .report-icon {
             background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
         }
-        
+
         .report-card.info .report-icon {
             background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
         }
-        
+
         .report-content h4 {
             font-size: 2rem;
             font-weight: bold;
             margin: 0;
             color: var(--text-color);
         }
-        
+
         .report-content p {
             margin: 0;
             color: var(--text-light);
             font-size: 0.9rem;
             font-weight: 500;
         }
-        
+
         .date-filter {
             background: var(--card-bg);
             border-radius: 15px;
@@ -452,7 +455,7 @@
             border: 1px solid var(--border-color);
             color: var(--text-color);
         }
-        
+
         .date-filter .form-control {
             border: 2px solid var(--border-color);
             border-radius: 8px;
@@ -462,14 +465,14 @@
             background: var(--card-bg);
             color: var(--text-color);
         }
-        
+
         .date-filter .form-control:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
             background: var(--card-bg);
         }
-        
-        
+
+
         .date-filter .btn {
             border-radius: 8px;
             padding: 0.5rem 1rem;
@@ -477,53 +480,53 @@
             font-weight: 500;
             transition: all 0.2s ease;
         }
-        
+
         .date-filter .btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
-        
+
         @media (max-width: 768px) {
             .date-filter .d-flex {
                 flex-direction: column;
                 align-items: stretch !important;
             }
-            
-            .date-filter .d-flex > div {
+
+            .date-filter .d-flex>div {
                 margin-bottom: 0.5rem;
             }
-            
+
             .date-filter .form-control {
                 width: 100% !important;
             }
         }
-        
+
         .loading {
             text-align: center;
             padding: 3rem;
             color: var(--text-light);
         }
-        
+
         .spinner-border {
             width: 3rem;
             height: 3rem;
             color: #667eea;
         }
-        
+
         .image-modal .modal-dialog {
             max-width: 80%;
         }
-        
+
         .image-modal .modal-body {
             text-align: center;
         }
-        
+
         .image-modal img {
             max-width: 100%;
             height: auto;
             border-radius: 10px;
         }
-        
+
         .back-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
@@ -539,26 +542,26 @@
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
             font-size: 0.9rem;
         }
-        
+
         .back-btn:hover {
             background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
             color: white;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-        
+
         .no-data {
             text-align: center;
             padding: 3rem;
             color: var(--text-light);
         }
-        
+
         .no-data i {
             font-size: 4rem;
             margin-bottom: 1rem;
             opacity: 0.5;
         }
-        
+
         /* Theme Toggle Button */
         #themeToggle {
             border-radius: 50%;
@@ -568,32 +571,32 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            border: 2px solid rgba(255,255,255,0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         #themeToggle:hover {
             transform: scale(1.1);
-            border-color: rgba(255,255,255,0.6);
-            background-color: rgba(255,255,255,0.1);
+            border-color: rgba(255, 255, 255, 0.6);
+            background-color: rgba(255, 255, 255, 0.1);
         }
-        
+
         @media (max-width: 768px) {
             .dashboard-title {
                 font-size: 2rem;
             }
-            
+
             .attendance-table th,
             .attendance-table td {
                 padding: 0.5rem;
                 font-size: 0.8rem;
             }
-            
+
             .student-avatar,
             .student-avatar-placeholder {
                 width: 40px;
                 height: 40px;
             }
-            
+
             .d-flex.justify-content-between {
                 flex-direction: column;
                 align-items: flex-start !important;
@@ -606,6 +609,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="dashboard-container">
         <!-- Header -->
@@ -727,9 +731,8 @@
                         <table class="attendance-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 80px;" class="sortable" data-sort="image">
+                                    <th style="width: 80px;">
                                         Hình ảnh
-                                        <i class="fas fa-sort sort-icon"></i>
                                     </th>
                                     <th style="width: 100px;" class="sortable" data-sort="mssv">
                                         MSSV
@@ -763,29 +766,30 @@
                     <p>Vui lòng chọn ngày khác hoặc kiểm tra lại sau.</p>
                 </div>
 
-    <!-- Image Modal -->
-    <div class="modal fade image-modal" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="imageModalLabel">
-                        <i class="fas fa-image me-2"></i>Hình ảnh điểm danh
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- Image Modal -->
+                <div class="modal fade image-modal" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="imageModalLabel">
+                                    <i class="fas fa-image me-2"></i>Hình ảnh điểm danh
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <img id="modalImage" src="" alt="Hình ảnh điểm danh" class="img-fluid">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <img id="modalImage" src="" alt="Hình ảnh điểm danh" class="img-fluid">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Dashboard functionality - simplified without authentication
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                    // Dashboard functionality - simplified without authentication
         let currentDate = new Date().toISOString().split('T')[0];
         let currentData = { students: [], attendance_logs: [] };
         let currentSort = { column: null, direction: 'asc' };
@@ -897,6 +901,10 @@
             if (dataCache.has(date)) {
                 console.log(`📦 Using cached data for date: ${date}`);
                 const cachedData = dataCache.get(date);
+                
+                // Set currentData trước khi gọi displaySummary
+                currentData = { students: cachedData.data.students, attendance_logs: cachedData.data.attendance_logs };
+                
                 displaySummary(cachedData.summary);
                 displayStudents(cachedData.data);
                 return;
@@ -925,6 +933,9 @@
                 // Cache the data
                 dataCache.set(date, { summary, data });
                 
+                // Set currentData trước khi gọi displaySummary
+                currentData = { students: data.students, attendance_logs: data.attendance_logs };
+                
                 displaySummary(summary);
                 displayStudents(data);
                 
@@ -936,13 +947,27 @@
             }
         }
         
-        // Display summary in report section
+        // Display summary in report section - CỰC KỲ ĐƠN GIẢN
         function displaySummary(summary) {
             const reportSection = document.getElementById('reportSection');
-            document.getElementById('totalStudents').textContent = summary.total_students;
-            document.getElementById('attendedCount').textContent = summary.attended_count;
-            document.getElementById('notAttendedCount').textContent = summary.not_attended_count;
-            document.getElementById('attendanceRate').textContent = summary.attendance_rate + '%';
+            
+            // CỰC KỲ ĐƠN GIẢN: Chỉ lấy kết quả từ API và cộng lại
+            const actualAttendedCount = summary.attended_count || 0;
+            const actualNotAttendedCount = summary.not_attended_count || 0;
+            const actualTotalStudents = actualAttendedCount + actualNotAttendedCount;
+            const actualAttendanceRate = actualTotalStudents > 0 ? 
+                Math.round((actualAttendedCount / actualTotalStudents) * 100 * 10) / 10 : 0;
+            
+            console.log(`📊 ULTRA SIMPLE: Just add the results together`);
+            console.log(`   Attended: ${actualAttendedCount} (from API)`);
+            console.log(`   Not Attended: ${actualNotAttendedCount} (from API)`);
+            console.log(`   Total: ${actualTotalStudents} (${actualAttendedCount} + ${actualNotAttendedCount})`);
+            console.log(`   Rate: ${actualAttendanceRate}%`);
+            
+            document.getElementById('totalStudents').textContent = actualTotalStudents;
+            document.getElementById('attendedCount').textContent = actualAttendedCount;
+            document.getElementById('notAttendedCount').textContent = actualNotAttendedCount;
+            document.getElementById('attendanceRate').textContent = actualAttendanceRate + '%';
             reportSection.style.display = 'block';
         }
         
@@ -963,9 +988,9 @@
                 noData.style.display = 'none';
             }
             
-            // Check if we have students data
-            if (!students || students.length === 0) {
-                console.log('❌ No students data available');
+            // Check if we have any data (students or attendance logs)
+            if ((!students || students.length === 0) && (!attendance_logs || attendance_logs.length === 0)) {
+                console.log('❌ No data available');
                 if (noData) {
                     noData.style.display = 'block';
                 }
@@ -1127,46 +1152,81 @@
         // Apply sorting to data
         function applySorting(students, attendance_logs) {
             const sortStartTime = performance.now();
-            console.log(`🔄 Starting sort process for ${students.length} students`);
+            console.log(`🔄 Starting sort process for ${students.length} students and ${attendance_logs.length} attendance logs`);
             
-            // Create attendance map - hỗ trợ cả MSSV và tên
+            // Create attendance map for quick lookup
             const attendanceMap = {};
-            attendance_logs.forEach(log => {
-                if (log.mssv && log.mssv.trim() !== '') {
-                    attendanceMap[log.mssv] = log;
-                }
-                // Nếu có tên nhưng không có MSSV, tạo key từ tên
-                if (log.ten && log.ten.trim() !== '' && (!log.mssv || log.mssv.trim() === '')) {
-                    attendanceMap[`NAME_${log.ten}`] = log;
-                }
-            });
+            if (attendance_logs) {
+                attendance_logs.forEach(log => {
+                    if (log.mssv && log.mssv.trim() !== '') {
+                        attendanceMap[log.mssv] = log;
+                    }
+                    // Nếu có tên nhưng không có MSSV, tạo key từ tên
+                    if (log.ten && log.ten.trim() !== '' && (!log.mssv || log.mssv.trim() === '')) {
+                        attendanceMap[`NAME_${log.ten}`] = log;
+                    }
+                });
+            }
             console.log(`📋 Created attendance map with ${Object.keys(attendanceMap).length} entries`);
             
-            // Create combined data array
-            const combinedData = students.map(student => {
-                // Tìm attendance log bằng MSSV hoặc tên
-                let attendance = attendanceMap[student.mssv];
-                if (!attendance && student.ten) {
-                    attendance = attendanceMap[`NAME_${student.ten}`];
-                }
-                
-                const isAttended = !!attendance;
-                
-                // Nếu có attendance log nhưng thiếu tên, sử dụng tên từ student data
-                let finalAttendance = attendance;
-                if (attendance && (!attendance.ten || attendance.ten.trim() === '')) {
-                    finalAttendance = {
-                        ...attendance,
-                        ten: student.ten || 'Không có tên'
-                    };
-                }
-                
-                return {
-                    student,
-                    attendance: finalAttendance || null,
-                    isAttended
-                };
-            });
+            // Create combined data array - bao gồm tất cả sinh viên từ danh sách gốc
+            const combinedData = [];
+            
+            // Thêm tất cả sinh viên từ danh sách gốc (có thể đã điểm danh hoặc chưa)
+            if (students) {
+                students.forEach(student => {
+                    // Tìm attendance log tương ứng
+                    let attendance = null;
+                    if (student.mssv && student.mssv.trim() !== '') {
+                        attendance = attendanceMap[student.mssv];
+                    }
+                    if (!attendance && student.ten) {
+                        attendance = attendanceMap[`NAME_${student.ten}`];
+                    }
+                    
+                    const isAttended = !!attendance;
+                    
+                    // Nếu có attendance log nhưng thiếu tên, sử dụng tên từ student data
+                    let finalAttendance = attendance;
+                    if (attendance && (!attendance.ten || attendance.ten.trim() === '')) {
+                        finalAttendance = {
+                            ...attendance,
+                            ten: student.ten || 'Không có tên'
+                        };
+                    }
+                    
+                    combinedData.push({
+                        student,
+                        attendance: finalAttendance || null,
+                        isAttended
+                    });
+                });
+            }
+            
+            // Thêm những người đã điểm danh nhưng không có trong danh sách sinh viên gốc
+            if (attendance_logs) {
+                attendance_logs.forEach(log => {
+                    // Kiểm tra xem log này đã được xử lý chưa
+                    const alreadyProcessed = combinedData.some(item => 
+                        item.attendance && item.attendance.mssv === log.mssv
+                    );
+                    
+                    if (!alreadyProcessed) {
+                        // Tạo student object từ attendance log
+                        const studentFromLog = {
+                            mssv: log.mssv || 'Không có MSSV',
+                            ten: log.ten || 'Không có tên'
+                        };
+                        
+                        combinedData.push({
+                            student: studentFromLog,
+                            attendance: log,
+                            isAttended: true
+                        });
+                    }
+                });
+            }
+            
             console.log(`🔗 Combined data: ${combinedData.length} items`);
             
             // Apply sorting
@@ -1218,6 +1278,7 @@
             
             return combinedData;
         }
-    </script>
+                </script>
 </body>
+
 </html>
