@@ -23,10 +23,11 @@
 -->
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Điểm Danh Sinh Viên Tổ 3</title>
+    <title>Điểm Danh Sinh Viên</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="/static/style.css" rel="stylesheet">
@@ -53,7 +54,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             position: relative;
         }
-        
+
         body::before {
             content: '';
             position: fixed;
@@ -64,7 +65,7 @@
             background: var(--background-overlay);
             z-index: -1;
         }
-        
+
         .main-container {
             min-height: 100vh;
             display: flex;
@@ -72,7 +73,7 @@
             justify-content: center;
             padding: 20px;
         }
-        
+
         .card {
             border: 2px solid var(--border-color);
             border-radius: 15px;
@@ -80,7 +81,7 @@
             background: var(--card-background);
             backdrop-filter: blur(10px);
         }
-        
+
         .card-header {
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
             color: white;
@@ -89,19 +90,19 @@
             padding: 2rem;
             border-bottom: 3px solid var(--accent-green);
         }
-        
+
         .card-title {
             font-size: 2rem;
             font-weight: bold;
             margin: 0;
         }
-        
+
         .card-subtitle {
             font-size: 1rem;
             opacity: 0.9;
             margin-top: 0.5rem;
         }
-        
+
         .form-control {
             border-radius: 10px;
             border: 2px solid var(--border-color);
@@ -110,13 +111,13 @@
             transition: all 0.3s ease;
             background: #fafafa;
         }
-        
+
         .form-control:focus {
             border-color: var(--accent-green);
             box-shadow: 0 0 0 0.2rem var(--shadow-green);
             background: white;
         }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
             border: 2px solid var(--accent-green);
@@ -127,7 +128,7 @@
             transition: all 0.3s ease;
             color: white;
         }
-        
+
         .btn-primary:hover {
             background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-green-light) 100%);
             border-color: var(--primary-dark);
@@ -135,7 +136,7 @@
             box-shadow: 0 8px 20px var(--shadow-green);
             color: white;
         }
-        
+
         .camera-container {
             position: relative;
             border-radius: 10px;
@@ -148,128 +149,128 @@
             justify-content: center;
             transition: all 0.3s ease;
         }
-        
+
         .camera-container:hover {
             border-color: var(--accent-green-light);
             background: #f0f8f0;
         }
-        
+
         #video {
             width: 100%;
             height: auto;
             border-radius: 15px;
         }
-        
+
         #canvas {
             display: none;
         }
-        
+
         .camera-placeholder {
             text-align: center;
             color: var(--accent-green);
         }
-        
+
         .camera-placeholder i {
             font-size: 4rem;
             margin-bottom: 1rem;
             color: var(--accent-green);
         }
-        
+
         .captured-image {
             width: 100%;
             height: auto;
             border-radius: 15px;
         }
-        
+
         .loading {
             display: none;
         }
-        
+
         .spinner-border {
             width: 2rem;
             height: 2rem;
         }
-        
+
         .alert {
             border-radius: 15px;
             border: none;
             font-weight: 500;
         }
-        
+
         .alert-success {
             background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
             color: #155724;
             border: 1px solid var(--accent-green);
             border-radius: 10px;
         }
-        
+
         .alert-danger {
             background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
             color: #721c24;
             border: 1px solid #e74c3c;
             border-radius: 10px;
         }
-        
+
         .modal-content {
             border-radius: 20px;
             border: none;
         }
-        
+
         .modal-header {
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
             color: white;
             border-radius: 20px 20px 0 0;
             border-bottom: 3px solid var(--accent-green);
         }
-        
+
         .btn-close {
             filter: invert(1);
         }
-        
+
         .success-icon {
             font-size: 4rem;
             color: var(--accent-green);
             margin-bottom: 1rem;
         }
-        
+
         .camera-controls {
             margin-top: 1rem;
         }
-        
+
         .btn-camera {
             margin: 0 5px;
             border-radius: 8px;
             font-weight: 500;
             transition: all 0.3s ease;
         }
-        
+
         .btn-outline-primary {
             border-color: var(--accent-green);
             color: var(--accent-green);
         }
-        
+
         .btn-outline-primary:hover {
             background-color: var(--accent-green);
             border-color: var(--accent-green);
             color: white;
         }
-        
+
         .btn-success {
             background-color: var(--accent-green);
             border-color: var(--accent-green);
         }
-        
+
         .btn-success:hover {
             background-color: var(--accent-green-light);
             border-color: var(--accent-green-light);
         }
-        
+
         .btn-outline-success {
             border-color: var(--accent-green);
             color: var(--accent-green);
             border-width: 2px;
         }
-        
+
         .btn-outline-success:hover {
             background-color: var(--accent-green);
             border-color: var(--accent-green);
@@ -277,17 +278,17 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px var(--shadow-green);
         }
-        
+
         .btn-warning {
             background-color: #f39c12;
             border-color: #f39c12;
         }
-        
+
         .btn-warning:hover {
             background-color: #e67e22;
             border-color: #e67e22;
         }
-        
+
         /* Dark Theme Styles */
         [data-theme="dark"] {
             --primary-dark: #1a1a2e;
@@ -379,6 +380,12 @@
             color: white;
         }
 
+        /* Dark theme cho placeholder */
+        [data-theme="dark"] .form-control::placeholder {
+            color: white !important;
+            opacity: 0.8;
+        }
+
         /* Theme Toggle Button */
         #themeToggle {
             border-radius: 50%;
@@ -398,11 +405,11 @@
             .card-header {
                 padding: 1.5rem;
             }
-            
+
             .card-title {
                 font-size: 1.5rem;
             }
-            
+
             .camera-container {
                 min-height: 250px;
             }
@@ -417,8 +424,76 @@
                 align-self: flex-end;
             }
         }
+
+        /* Footer Credit Styles */
+        .footer-credit {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+            border-top: 2px solid var(--accent-green);
+            font-size: 0.9rem;
+            opacity: 0.9;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer-credit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .footer-credit .credit-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer-credit .credit-text {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .footer-credit .credit-authors {
+            font-weight: 600;
+            color: var(--accent-green-light);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .footer-credit .credit-website {
+            margin: 0.5rem 0 0 0;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .footer-credit .credit-website a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .footer-credit .credit-website a:hover {
+            color: #0056b3;
+            text-shadow: 1px 1px 2px rgba(0, 123, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .footer-credit {
+                font-size: 0.8rem;
+                padding: 0.8rem 0;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div class="main-container">
         <div class="container">
@@ -441,34 +516,34 @@
                         </div>
                         <div class="card-body p-4">
                             <!-- Box Lưu ý -->
-                            <div class="alert alert-info border-0 mb-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border-left: 4px solid #2196f3;">
+                            <div class="alert alert-info border-0 mb-4"
+                                style="background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border-left: 4px solid #2196f3;">
                                 <div class="d-flex align-items-start">
-                                    <i class="fas fa-info-circle text-primary me-3 mt-1" style="font-size: 1.2rem;"></i>
+                                    <i style="font-size: 1.2rem;"></i>
                                     <div>
                                         <h6 class="alert-heading mb-2 fw-bold text-primary">
                                             <i class="fas fa-exclamation-triangle me-2"></i>
                                             Lưu ý quan trọng
                                         </h6>
-                                        <p class="mb-0 text-dark">
-                                            <strong>Mỗi sinh viên chỉ có thể điểm danh 1 lần duy nhất trong ngày.</strong><br>
-                                            <strong>Tổ trưởng tổ 3 không có trách nhiệm với thành viên tổ khác</strong><br>
-                                            <strong>Sinh viên thuộc tổ khác sẽ không hiện tên và MSSV sau khi điểm danh xong.</strong><br>
-                                            Hãy nhập đúng mã số sinh viên và chụp ảnh rõ nét để tránh sai sót.
+                                        <p class="mb-0 text-red">
+                                            <strong> => Mỗi sinh viên chỉ có thể điểm danh 1 lần duy nhất trong ngày.</strong><br>
+                                            <strong> => Điểm danh sẽ không hợp lệ nếu quá sớm hoặc quá trễ giờ bắt đầu và kết thúc môn học.</strong><br>
+                                            <strong> => Hình ảnh không nhất thiết phải là hình chụp bản thân nhưng phải chứng minh được sự hiện diện của sinh viên.</strong><br>
                                         </p>
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <form id="attendanceForm" enctype="multipart/form-data">
                                 <div class="mb-4">
                                     <label for="mssv" class="form-label fw-bold">
                                         <i class="fas fa-id-card me-2"></i>
                                         Mã số sinh viên
                                     </label>
-                                    <input type="text" class="form-control" id="mssv" name="mssv" 
+                                    <input type="text" class="form-control" id="mssv" name="mssv"
                                            placeholder="Nhập MSSV của bạn" required>
                                 </div>
-                                
+
                                 <div class="mb-4">
                                     <label class="form-label fw-bold">
                                         <i class="fas fa-camera me-2"></i>
@@ -495,18 +570,18 @@
                                         </button>
                                     </div>
                                 </div>
-                                
+
                                 <div class="d-grid gap-2">
                                     <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
                                         <i class="fas fa-check-circle me-2"></i>
                                         Điểm Danh
                                     </button>
-                                    <a href="/dashboard" class="btn btn-outline-success btn-lg">
+                                    <a href="/dashboard-secret" class="btn btn-outline-success btn-lg">
                                         <i class="fas fa-list-alt me-2"></i>
                                         Check Điểm Danh
                                     </a>
                                 </div>
-                                
+
                                 <div class="loading text-center mt-3">
                                     <div class="spinner-border text-primary" role="status">
                                         <span class="visually-hidden">Đang xử lý...</span>
@@ -548,14 +623,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/script.js"></script>
-    
+
     <!-- Link ẩn dashboard - chỉ hiển thị khi click vào logo 5 lần -->
     <div id="hiddenDashboardLink" style="display: none; position: fixed; bottom: 10px; right: 10px; z-index: 9999;">
         <a href="/dashboard-secret" class="btn btn-sm btn-outline-secondary" style="opacity: 0.3;">
             <i class="fas fa-tachometer-alt"></i>
         </a>
     </div>
-    
+
     <script>
         // Theme Toggle Functionality
         const themeToggle = document.getElementById('themeToggle');
@@ -603,5 +678,19 @@
             }
         });
     </script>
+
+    <!-- Footer Credit -->
+    <footer class="footer-credit">
+        <div class="credit-content">
+            <p class="credit-text">
+                Copyright by <span class="credit-authors">Song Phương &copy; Hoàng Minh Dương</span>
+            </p>
+            <p class="credit-website">
+                <a href="https://songphuong.vn" target="_blank" rel="noopener noreferrer">songphuong.vn</a> - Chuyên
+                cung cấp giải pháp máy tính, linh kiện chính hãng.
+            </p>
+        </div>
+    </footer>
 </body>
+
 </html>
