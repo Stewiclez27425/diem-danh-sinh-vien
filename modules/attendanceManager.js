@@ -45,12 +45,12 @@ class AttendanceManager {
         }
     }
 
-    async checkAlreadyAttended(ipAddress) {
+    async checkAlreadyAttended(mssv) {
         try {
             const today = moment().tz('Asia/Ho_Chi_Minh').format('YYYY-MM-DD');
             
             return this.logs.some(log => 
-                log.ip === ipAddress && log.ngay === today
+                log.mssv === mssv && log.ngay === today
             );
         } catch (error) {
             console.error('Lỗi check already attended:', error);
@@ -148,12 +148,37 @@ class AttendanceManager {
                 };
             }
 
-            // Get all students from student list
-            const allStudentMSSVs = new Set(studentList.map(s => s.mssv));
-            const notAttendedStudents = Array.from(allStudentMSSVs).filter(mssv => !attendedStudents.has(mssv));
+            // Get all students from student list and create a map for quick lookup
+            const studentMap = new Map();
+            studentList.forEach(student => {
+                studentMap.set(student.mssv, student);
+            });
+
+            // Get attended students with full info from student list
+            const attendedStudentsWithInfo = [];
+            const notAttendedStudents = [];
+
+            for (const student of studentList) {
+                if (attendedStudents.has(student.mssv)) {
+                    // Student attended - use info from attendance log
+                    attendedStudentsWithInfo.push({
+                        mssv: student.mssv,
+                        ten: attendanceDetails[student.mssv].ten || student.ten,
+                        thoiGian: attendanceDetails[student.mssv].thoiGian,
+                        hinhAnh: attendanceDetails[student.mssv].hinhAnh,
+                        ip: attendanceDetails[student.mssv].ip
+                    });
+                } else {
+                    // Student not attended
+                    notAttendedStudents.push({
+                        mssv: student.mssv,
+                        ten: student.ten
+                    });
+                }
+            }
 
             const totalStudents = studentList.length;
-            const attendedCount = attendedStudents.size;
+            const attendedCount = attendedStudentsWithInfo.length;
             const notAttendedCount = notAttendedStudents.length;
             const attendanceRate = totalStudents > 0 ? Math.round((attendedCount / totalStudents) * 100 * 10) / 10 : 0;
 
@@ -162,7 +187,7 @@ class AttendanceManager {
                 attended_count: attendedCount,
                 not_attended_count: notAttendedCount,
                 attendance_rate: attendanceRate,
-                attended_students: Array.from(attendedStudents),
+                attended_students: attendedStudentsWithInfo,
                 not_attended_students: notAttendedStudents,
                 attendance_details: attendanceDetails,
                 selected_date: selectedDate
