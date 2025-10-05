@@ -81,6 +81,7 @@ class StudentManager {
             for (const row of data) {
                 const mssv = String(row['MSSV'] || '').trim();
                 const ten = String(row['Tên Sinh Viên'] || '').trim();
+                const to = String(row['Tổ'] || row['Tô'] || '').trim(); // Thử cả 'Tô' nếu có lỗi encoding
                 
                 // Bỏ qua dòng trống
                 if (!mssv && !ten) {
@@ -98,10 +99,13 @@ class StudentManager {
                     const finalTen = ten || `Sinh viên ${mssv}`;
                     // Tạo MSSV mặc định nếu thiếu
                     const finalMssv = mssv || `UNKNOWN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                    // Xử lý tổ
+                    const finalTo = to && to !== 'nan' ? parseInt(to) : null;
                     
                     this.students.push({ 
                         mssv: finalMssv, 
-                        ten: finalTen 
+                        ten: finalTen,
+                        to: finalTo
                     });
                 }
             }
@@ -130,8 +134,9 @@ class StudentManager {
                         .on('data', (row) => {
                             const mssv = String(row['MSSV'] || '').trim();
                             const ten = String(row['Tên Sinh Viên'] || '').trim();
+                            const to = String(row['Tổ'] || row['Tô'] || '').trim(); // Thử cả 'Tô' nếu có lỗi encoding
                             
-                            console.log('📝 Đọc dòng CSV:', { mssv, ten, raw: row });
+                            console.log('📝 Đọc dòng CSV:', { mssv, ten, to, raw: row });
                             
                             // Kiểm tra dòng trống hoặc không hợp lệ
                             if (!mssv && !ten) {
@@ -151,14 +156,17 @@ class StudentManager {
                                 const finalTen = ten || `Sinh viên ${mssv}`;
                                 // Tạo MSSV mặc định nếu thiếu
                                 const finalMssv = mssv || `UNKNOWN_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                                // Xử lý tổ
+                                const finalTo = to && to !== 'nan' ? parseInt(to) : null;
                                 
                                 students.push({ 
                                     mssv: finalMssv, 
-                                    ten: finalTen 
+                                    ten: finalTen,
+                                    to: finalTo
                                 });
-                                console.log('✅ Đã thêm sinh viên:', { mssv: finalMssv, ten: finalTen });
+                                console.log('✅ Đã thêm sinh viên:', { mssv: finalMssv, ten: finalTen, to: finalTo });
                             } else {
-                                console.log('❌ Bỏ qua dòng không hợp lệ:', { mssv, ten });
+                                console.log('❌ Bỏ qua dòng không hợp lệ:', { mssv, ten, to });
                             }
                         })
                         .on('end', () => {
@@ -186,16 +194,16 @@ class StudentManager {
 
     async createSampleCSV() {
         const sampleData = [
-            { 'MSSV': 'SV001', 'Tên Sinh Viên': 'Nguyễn Văn A' },
-            { 'MSSV': 'SV002', 'Tên Sinh Viên': 'Trần Thị B' },
-            { 'MSSV': 'SV003', 'Tên Sinh Viên': 'Lê Văn C' },
-            { 'MSSV': 'SV004', 'Tên Sinh Viên': 'Phạm Thị D' },
-            { 'MSSV': 'SV005', 'Tên Sinh Viên': 'Hoàng Văn E' },
-            { 'MSSV': 'SV006', 'Tên Sinh Viên': 'Vũ Thị F' },
-            { 'MSSV': 'SV007', 'Tên Sinh Viên': 'Đặng Văn G' },
-            { 'MSSV': 'SV008', 'Tên Sinh Viên': 'Bùi Thị H' },
-            { 'MSSV': 'SV009', 'Tên Sinh Viên': 'Phan Văn I' },
-            { 'MSSV': 'SV010', 'Tên Sinh Viên': 'Võ Thị K' }
+            { 'MSSV': 'SV001', 'Tên Sinh Viên': 'Nguyễn Văn A', 'Tổ': '1' },
+            { 'MSSV': 'SV002', 'Tên Sinh Viên': 'Trần Thị B', 'Tổ': '1' },
+            { 'MSSV': 'SV003', 'Tên Sinh Viên': 'Lê Văn C', 'Tổ': '2' },
+            { 'MSSV': 'SV004', 'Tên Sinh Viên': 'Phạm Thị D', 'Tổ': '2' },
+            { 'MSSV': 'SV005', 'Tên Sinh Viên': 'Hoàng Văn E', 'Tổ': '3' },
+            { 'MSSV': 'SV006', 'Tên Sinh Viên': 'Vũ Thị F', 'Tổ': '3' },
+            { 'MSSV': 'SV007', 'Tên Sinh Viên': 'Đặng Văn G', 'Tổ': '4' },
+            { 'MSSV': 'SV008', 'Tên Sinh Viên': 'Bùi Thị H', 'Tổ': '4' },
+            { 'MSSV': 'SV009', 'Tên Sinh Viên': 'Phan Văn I', 'Tổ': '1' },
+            { 'MSSV': 'SV010', 'Tên Sinh Viên': 'Võ Thị K', 'Tổ': '2' }
         ];
 
         try {
