@@ -379,12 +379,8 @@
                 object-fit: cover;
                 border: 3px solid #fff;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                cursor: pointer;
-                transition: transform 0.2s ease;
-            }
-            
-            .student-avatar:hover {
-                transform: scale(1.1);
+                cursor: default;
+                transition: none;
             }
             
             .student-avatar-placeholder {
@@ -1407,8 +1403,8 @@
                         <p>Không tìm thấy thêm dữ liệu.</p>
                     </div>
 
-        <!-- Image Modal -->
-        <div class="modal fade image-modal" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <!-- Image Modal - DISABLED -->
+        <!-- <div class="modal fade image-modal" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -1425,7 +1421,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Footer Credit -->
         <footer class="footer-credit">
@@ -1440,6 +1436,7 @@
         </footer>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
         <script>
             // Dashboard functionality - simplified without authentication
             let currentDate = new Date().toISOString().split('T')[0];
@@ -2200,13 +2197,13 @@
                         <tr class="${matchesFilters ? 'student-row-visible' : 'student-row-hidden'}">
                             <td>
                                 ${isAttended ? `
-                                    ${finalAttendance.hinhAnh && finalAttendance.hinhAnh.trim() !== '' ? `
+                                    ${finalAttendance.hinhAnh && finalAttendance.hinhAnh.trim() !== '' && isImageValid(finalAttendance.thoiGian) ? `
                                         <img src="${finalAttendance.hinhAnh}" 
                                             class="student-avatar" 
-                                            onclick="showImage('${finalAttendance.hinhAnh}')" 
-                                            alt="Ảnh điểm danh">
+                                            alt="Ảnh điểm danh"
+                                            style="cursor: default;">
                                     ` : `
-                                        <div class="student-avatar-default" onclick="showDefaultAvatar()">
+                                        <div class="student-avatar-default" style="cursor: default;">
                                             <i class="fas fa-user"></i>
                                         </div>
                                     `}
@@ -2259,38 +2256,44 @@
                 displaySummary(summary);
             }
             
-            // Show image modal
-            function showImage(imageSrc) {
-                const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-                document.getElementById('modalImage').src = imageSrc;
-                modal.show();
-            }
+        // Check if image is still valid (not older than 48 hours)
+        function isImageValid(attendanceTime) {
+            if (!attendanceTime) return false;
             
-            // Show default avatar modal
-            function showDefaultAvatar() {
-                const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-                const modalBody = document.querySelector('#imageModal .modal-body');
-                
-                // Lưu nội dung gốc của modal body
-                const originalContent = modalBody.innerHTML;
-                
-                // Tạo nội dung mới cho avatar mặc định
-                modalBody.innerHTML = `
-                    <div class="text-center">
-                        <div class="student-avatar-default mx-auto mb-3" style="width: 100px; height: 100px; font-size: 3rem;">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <p class="text-muted">Không có hình ảnh điểm danh</p>
-                    </div>
-                `;
-                
-                modal.show();
-                
-                // Khôi phục nội dung gốc khi modal đóng
-                modal._element.addEventListener('hidden.bs.modal', function() {
-                    modalBody.innerHTML = originalContent;
-                }, { once: true });
-            }
+            const recordTime = moment(attendanceTime, 'YYYY-MM-DD HH:mm:ss');
+            const cutoffTime = moment().subtract(48, 'hours');
+            
+            return recordTime.isAfter(cutoffTime);
+        }
+
+        // Image modal functions disabled
+        // function showImage(imageSrc) {
+        //     const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+        //     document.getElementById('modalImage').src = imageSrc;
+        //     modal.show();
+        // }
+        
+        // function showDefaultAvatar() {
+        //     const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+        //     const modalBody = document.querySelector('#imageModal .modal-body');
+        //     
+        //     const originalContent = modalBody.innerHTML;
+        //     
+        //     modalBody.innerHTML = `
+        //         <div class="text-center">
+        //             <div class="student-avatar-default mx-auto mb-3" style="width: 100px; height: 100px; font-size: 3rem;">
+        //                 <i class="fas fa-user"></i>
+        //             </div>
+        //             <p class="text-muted">Không có hình ảnh điểm danh</p>
+        //         </div>
+        //     `;
+        //     
+        //     modal.show();
+        //     
+        //     modal._element.addEventListener('hidden.bs.modal', function() {
+        //         modalBody.innerHTML = originalContent;
+        //     }, { once: true });
+        // }
             
             // Show loading
             function showLoading(show) {
