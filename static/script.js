@@ -26,6 +26,8 @@
 // Biến toàn cục
 let stream = null;
 let capturedImageData = null;
+let currentCameraIndex = 0;
+let availableCameras = [];
 
 // DOM Elements
 const form = document.getElementById('attendanceForm');
@@ -36,6 +38,7 @@ const capturedImage = document.getElementById('capturedImage');
 const cameraContainer = document.getElementById('cameraContainer');
 const cameraPlaceholder = document.getElementById('cameraPlaceholder');
 const startCameraBtn = document.getElementById('startCamera');
+const switchCameraBtn = document.getElementById('switchCamera');
 const capturePhotoBtn = document.getElementById('capturePhoto');
 const retakePhotoBtn = document.getElementById('retakePhoto');
 const submitBtn = document.getElementById('submitBtn');
@@ -47,21 +50,49 @@ const successTime = document.getElementById('successTime');
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
     startCameraBtn.addEventListener('click', startCamera);
+    switchCameraBtn.addEventListener('click', switchCamera);
     capturePhotoBtn.addEventListener('click', capturePhoto);
     retakePhotoBtn.addEventListener('click', retakePhoto);
     form.addEventListener('submit', handleSubmit);
 });
 
+// Lấy danh sách camera có sẵn
+async function getAvailableCameras() {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        availableCameras = devices.filter(device => device.kind === 'videoinput');
+        return availableCameras;
+    } catch (error) {
+        console.error('Lỗi khi lấy danh sách camera:', error);
+        return [];
+    }
+}
+
 // Bật camera
 async function startCamera() {
     try {
-        stream = await navigator.mediaDevices.getUserMedia({ 
+        // Lấy danh sách camera nếu chưa có
+        if (availableCameras.length === 0) {
+            await getAvailableCameras();
+        }
+        
+        // Cấu hình camera
+        const constraints = {
             video: { 
                 width: { ideal: 640 },
-                height: { ideal: 480 },
-                facingMode: 'user'
-            } 
-        });
+                height: { ideal: 480 }
+            }
+        };
+        
+        // Nếu có nhiều camera, sử dụng camera đầu tiên (thường là camera trước)
+        if (availableCameras.length > 0) {
+            constraints.video.deviceId = { exact: availableCameras[currentCameraIndex].deviceId };
+        } else {
+            // Fallback: sử dụng camera trước
+            constraints.video.facingMode = 'user';
+        }
+        
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
         
         video.srcObject = stream;
         video.style.display = 'block';
@@ -69,12 +100,57 @@ async function startCamera() {
         startCameraBtn.style.display = 'none';
         capturePhotoBtn.style.display = 'inline-block';
         
+        // Hiển thị nút chuyển camera nếu có nhiều hơn 1 camera
+        if (availableCameras.length > 1) {
+            switchCameraBtn.style.display = 'inline-block';
+        }
+        
         // Hiển thị thông báo thành công
         showAlert('Camera đã được bật thành công!', 'success');
         
     } catch (error) {
         console.error('Lỗi khi bật camera:', error);
         showAlert('Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.', 'danger');
+    }
+}
+
+// Chuyển camera
+async function switchCamera() {
+    if (availableCameras.length <= 1) {
+        showAlert('Chỉ có 1 camera khả dụng', 'warning');
+        return;
+    }
+    
+    try {
+        // Dừng camera hiện tại
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+        
+        // Chuyển sang camera tiếp theo
+        currentCameraIndex = (currentCameraIndex + 1) % availableCameras.length;
+        
+        // Cấu hình camera mới
+        const constraints = {
+            video: { 
+                width: { ideal: 640 },
+                height: { ideal: 480 },
+                deviceId: { exact: availableCameras[currentCameraIndex].deviceId }
+            }
+        };
+        
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        
+        // Cập nhật text nút chuyển camera
+        const cameraLabel = availableCameras[currentCameraIndex].label || `Camera ${currentCameraIndex + 1}`;
+        switchCameraBtn.innerHTML = `<i class="fas fa-sync-alt me-2"></i>Đổi Camera (${cameraLabel})`;
+        
+        showAlert(`Đã chuyển sang ${cameraLabel}`, 'success');
+        
+    } catch (error) {
+        console.error('Lỗi khi chuyển camera:', error);
+        showAlert('Không thể chuyển camera. Vui lòng thử lại.', 'danger');
     }
 }
 
@@ -187,8 +263,12 @@ function resetForm() {
     video.style.display = 'none';
     cameraPlaceholder.style.display = 'block';
     startCameraBtn.style.display = 'inline-block';
+    switchCameraBtn.style.display = 'none';
     capturePhotoBtn.style.display = 'none';
     retakePhotoBtn.style.display = 'none';
+    
+    // Reset camera index về 0
+    currentCameraIndex = 0;
     
     // Dừng camera nếu đang chạy
     if (stream) {
