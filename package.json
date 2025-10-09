@@ -17,7 +17,7 @@
     "express",
     "bootstrap"
   ],
-  "author": "Your Name",
+  "author": "Hoang Minh Duong - songphuong.vn",
   "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
@@ -36,10 +36,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/student-attendance-system.git"
+    "url": "https://github.com/hmduongdl/ATTENDANCE-STUDENTS-WEB"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/student-attendance-system/issues"
+    "url": "https://github.com/hmduongdl/ATTENDANCE-STUDENTS-WEB"
   },
-  "homepage": "https://github.com/yourusername/student-attendance-system#readme"
+  "homepage": "https://github.com/hmduongdl/ATTENDANCE-STUDENTS-WEB"
 }
