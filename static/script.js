@@ -326,3 +326,4 @@ if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     startCameraBtn.disabled = true;
 }
 
+
